@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Feed</h2>
+    
+    <!-- Feed Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary mt-3">Post</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feed List -->
+    {% for feed in feeds %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h5 class="card-title">{{ feed.user.username }}</h5>
+                <small class="text-muted">{{ feed.created_at|timesince }} ago</small>
+            </div>
+            <p class="card-text">{{ feed.content }}</p>
+            {% if feed.user == request.user %}
+            <form method="post" action="{% url 'feeds:delete_feed' feed.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">No posts yet. Be the first to post!</div>
+    {% endfor %}
+</div>
+{% endblock %}
